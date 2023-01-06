@@ -47,7 +47,9 @@ class Binomial(Distribution):
         #               farther down in the code starting in line 55. 
         #               The init function can get access to these methods via the self
         #               variable.   
-        pass            
+        self.p = prob
+        self.n = size 
+        Distribution.__init__(self, self.calculate_mean(), self.calculate_stdev())           
     
     def calculate_mean(self):
     
@@ -64,7 +66,8 @@ class Binomial(Distribution):
         # TODO: calculate the mean of the Binomial distribution. Store the mean
         #       via the self variable and also return the new mean value
                 
-        pass 
+        self.mean = self.p * self.n
+        return self.mean
 
 
 
@@ -83,7 +86,8 @@ class Binomial(Distribution):
         # TODO: calculate the standard deviation of the Binomial distribution. Store
         #       the result in the self standard deviation attribute. Return the value
         #       of the standard deviation.
-        pass
+        self.stdev = math.sqrt(self.n * self.p * (1 - self.p))
+        return self.stdev
         
         
         
@@ -116,8 +120,13 @@ class Binomial(Distribution):
         #           updates the standard deviation attribute
         #
         #       Hint: You can use the calculate_mean() and calculate_stdev() methods
-        #           defined previously.
-        pass
+        #           defined previously.python test.py
+        self.read_data_file('numbers_binomial.txt')
+        self.p = sum(self.data) / len(self.data)
+        self.n = len(self.data)
+        self.calculate_mean()
+        self.calculate_stdev()
+        return self.p, self.n
         
     def plot_bar(self):
         """Function to output a histogram of the instance variable data using 
@@ -141,7 +150,11 @@ class Binomial(Distribution):
         #       1 on the x-axis and 20 on the y-axis
         
         #       Make sure to label the chart with a title, x-axis label and y-axis label
-        pass        
+        plt.hist(self.data)
+        plt.title('Histogram of Data')
+        plt.xlabel('data')
+        plt.ylabel('count')    
+
         
     def pdf(self, k):
         """Probability density function calculator for the gaussian distribution.
@@ -162,7 +175,7 @@ class Binomial(Distribution):
         #   For example, if you flip a coin n = 60 times, with p = .5,
         #   what's the likelihood that the coin lands on heads 40 out of 60 times?
         
-        pass        
+        return math.factorial(self.n) / (math.factorial(k) * math.factorial(self.n - k)) * math.pow(self.p,k) * math.pow(1-self.p, self.n-k)   
 
     def plot_bar_pdf(self):
 
@@ -187,6 +200,15 @@ class Binomial(Distribution):
 
         #   This method should also return the x and y values used to make the chart
         #   The x and y values should be stored in separate lists
+        x=[]; y=[]
+        for i in range(self.n, step=0.1):
+            x.append(i)
+            y.append(self.pdf(i))
+        plt.bar(x=x, y=y)
+        plt.title('Binomial probability density function')
+        plt.xlabel('probability')
+        plt.ylabel('# observations k')
+
                 
     def __add__(self, other):
         
@@ -219,7 +241,12 @@ class Binomial(Distribution):
         #   When adding two binomial distributions, the p value remains the same
         #   The new n value is the sum of the n values of the two distributions.
                 
-        pass
+        new_n = self.n + other.n
+        new_p = self.p
+        new_func = Binomial(new_p, new_n)
+        new_func.calculate_mean()
+        new_func.calculate_stdev()
+        return new_func
         
         
     def __repr__(self):
@@ -240,4 +267,6 @@ class Binomial(Distribution):
         #       with the values replaced by whatever the actual distributions values are
         #       The method should return a string in the expected format
     
-        pass
+        return print(   f'mean= {self.mean:.1f}, standard deviation= {self.stdev:.1f},',
+                        f'p= {self.p:.1f}, n= {self.n:.1f}'
+                        )
